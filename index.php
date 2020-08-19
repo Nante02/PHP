@@ -9,7 +9,7 @@ try {
     $conn = new PDO("mysql:host=$serverName;dbname=test", $userName, $password);
     // $conn -> setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOExeption $e) {
-    echo "Connection failed" . $e->getMessage();
+    echo "Connection failed , Erreur : " . $e->getMessage();
 }
 $sql = "SELECT * FROM note";
 $result = $conn->query($sql);
@@ -25,6 +25,43 @@ $result = $conn->query($sql);
     </style>
 </head>
 <body>
+    <form action="" method="post">
+        <div class="form-element" style="margin : 10px;">
+            <label for="Nom">Nom : </label>
+            <input type="text" name="Nom" id="Nom" placeholder="Nom" required>
+        </div>
+        <div class="form-element" style="margin : 10px;">
+            <label for="Prenom">Prénom : </label>
+            <input type="text" name="Prenom" id="Prenom" placeholder="Prénom" required>
+        </div>
+        <div class="form-element" style="margin : 10px;">
+            <label for="Moyenne">Moyenne : </label>
+            <input type="text" name="Moyenne" id="Moyenne" placeholder="Moyenne" required>
+        </div>
+        <div class="boutton" style="margin : 10px;">
+            <input type="submit" name = "submit" value="Enregistrer">
+        </div>
+    </form>
+    <!-- //////////////////////////////// -->
+    <?php
+        if (isset($_POST["submit"])){
+            $nom = $_POST["Nom"];
+            $prenom = $_POST["Prenom"];
+            $moyenne = $_POST["Moyenne"];
+            echo $nom.$prenom.$moyenne;
+
+            $insersion = $conn->prepare("INSERT INTO note(Nom,Prenom,Moyenne) VALUE (:nom,:prenom,:moyenne) ");
+            $insersion -> execute(array(
+                "nom" => $nom,
+                "prenom" => $prenom,
+                "moyenne" => $moyenne
+            ));
+            header("Location: index.php");
+
+        }
+    ?>
+    <!-- ///////////////////////////////// -->
+    <hr>
     <h1>Affichage de donnée</h1>
     <table border= "1px">
         <thead>
