@@ -3,6 +3,25 @@ require "vendor/autoload.php";
 $serverName = "localhost";
 $userName = "root";
 $password = "";
+$idRemove;
+$idUpdate;
+$formUpdate = '<form action="" method="post">
+<div class="form-element" style="margin : 10px;"
+    <label for="NomModif">Nom : </label>
+    <input type="text" name="NomModif" id="NomModif" placeholder="Nom" required>
+</div>
+<div class="form-element" style="margin : 10px;">
+    <label for="PrenomModif">Prénom : </label>
+    <input type="text" name="PrenomModif" id="PrenomModif" placeholder="Prénom" required>
+</div>
+<div class="form-element" style="margin : 10px;">
+    <label for="MoyenneModif">Moyenne : </label>
+    <input type="text" name="MoyenneModif" id="MoyenneModif" placeholder="Moyenne" required>
+</div>
+<div class="boutton" style="margin : 10px;">
+    <input type="submit" name = "modifier" value="Enregistrer">
+</div>
+</form>';
 
 try {
     // connection par PDO (language:host=nomDuServer;dbname=nomDB,userName,pass)
@@ -81,9 +100,47 @@ $result = $conn->query($sql);
                 <td><?php echo $row["Nom"];?></td>
                 <td><?php echo $row["Prenom"];?></td>
                 <td><?php echo $row["Moyenne"];?></td>
+                <td>
+                    <form action="" method="get">
+                    <!-- <input type="submit" value="supp" name=<?php echo '"'.$row["id"].'"'?> style="background-color : red;"> -->
+                    <!-- <input type="submit" name="" value="modif"> -->
+                    <button type="submit" value = <?php echo '"'.$row["id"].'"'?> name="supp" style="background-color : red;"> suppr</button>
+                    <button type="submit" value = <?php echo '"'.$row["id"].'"'?> name="modif" style="background-color : yellow;"> modif</button>    
+                </form>
+                </td>
             </tr>
-                <?php }?>
+            <!-- /////////////////////////////////////////// -->
+                <?php 
+                }
+                if (isset($_GET["supp"])){
+                    $idRemove = $_GET["supp"];
+                    $conn->exec("DELETE FROM note WHERE id= $idRemove");
+                    header("Location :index.php");
+                    
+                }?>
+                <!-- /////////////////////////////////////////// -->
         </tbody>
     </table>
+    <?php
+    if (isset($_GET["modif"])){
+        $idUpdate = $_GET["modif"];
+        echo $formUpdate;
+        if (isset($_POST["modifier"])){
+            $nom = $_POST["NomModif"];
+            $prenom = $_POST["PrenomModif"];
+            $moyenne = $_POST["MoyenneModif"];
+            echo $nom.$prenom.$moyenne;
+
+            $insersion = $conn->prepare("UPDATE note SET Nom = :nom, Prenom = :prenom, Moyenne = :moyenne WHERE id = $idUpdate ");
+            $insersion -> execute(array(
+                "nom" => $nom,
+                "prenom" => $prenom,
+                "moyenne" => $moyenne
+            ));
+            header("Location: index.php");
+
+        }
+    }
+    ?>
 </body>
 </html>
